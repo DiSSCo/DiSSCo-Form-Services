@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"> </script>
+    <script
+			src="https://code.jquery.com/jquery-3.6.0.min.js"
+			integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+			crossorigin="anonymous">
+    </script>
+    <script src="https://kit.fontawesome.com/438a96030a.js" crossorigin="anonymous"></script>
+  </head>
+
+  <style>
+    body {
+      background-color: #e6eeff;
+    }
+
+    .active {
+      display: block !important;
+    }
+
+    .disscoImage {
+      position: absolute;
+      width: 200px;
+      left: 3%;
+      top: 3%;
+    }
+
+    .interface {
+      position: absolute;
+      top: 10%;
+      right: 0;
+      left: 0;
+    }
+
+    .tab {
+      background-color: white; 
+      height: 40px; 
+      line-height: 40px; 
+      text-align: center; 
+      cursor: pointer;
+      border-right: 1px solid #e6e6e6;
+    }
+
+    .tab.outer {
+      -webkit-box-shadow: 12px 20px 20px 0px rgba(0,0,0,0.58); 
+      box-shadow: 12px 20px 20px 0px rgba(0,0,0,0.58);
+      border-right: none;
+    }
+
+    .tab.active {
+      background-color: #b3cbff;
+      cursor: default;
+    }
+
+    .generalSection {
+      background-color: white;
+      height: 500px;
+      -webkit-box-shadow: 7px 14px 24px -5px #000000; 
+      box-shadow: 7px 12px 24px -5px #000000;
+      overflow-y: scroll;
+    }
+
+    .applicationSection {
+      display: none;
+    }
+
+    .section {
+      display: none;
+      padding-top: 3% !important;
+      padding-bottom: 3% !important;
+    }
+
+    .subtitle {
+      font-size: 20px;
+    }
+
+    .paragraph {
+      font-size: 14px;
+      margin-top: 3% !important;
+    }
+
+    .searchButton {
+      display: inline;
+      font-size: 18px;
+    }
+
+    .input {
+      z-index: 1;
+      position: relative;
+    }
+
+    .select {
+      height: 30px;
+      width: 50%;
+      background-color: white;
+    }
+
+    .submitButton {
+      width: 100%;
+      height: 40px;
+      line-height: 40px;
+      background-color: #b3cbff;
+      border: none;
+      margin-top: 10%;
+    }
+
+    .loading {
+      background-color: #b3cbff;
+      position: absolute;
+      display: inline-block;
+      margin-left: -30px !important;
+      z-index: 0;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      font-size: 20px;
+      transition: linear 0.25s;
+    }
+
+    .loading.monkey {
+      z-index: -1;
+    }
+
+    .loading.load {
+      margin-left: 0px !important;
+    }
+
+    .spinner-border {
+      width: 20px;
+      height: 20px;
+      margin: 5px 0px 0px 5px;
+      display: none;
+    }
+
+    .confirmationIcon {
+      display: none;
+    }
+
+    .selectModeBlock {
+      padding: 1%;
+      text-align: center;
+    }
+
+    .selectModeTitle {
+      font-size: 20px;
+    }
+
+    .selectMode {
+      background-color: white;
+      border: 1px solid #b3cbff;
+      height: 55px;
+      line-height: 55px;
+      cursor: pointer;
+    }
+
+    .selectMode.active {
+      background-color: #b3cbff;
+      cursor: default;
+    }
+
+  </style>
+
+  <body>
+    <div class="disscoImage">
+      <img src="https://www.dissco.eu/wp-content/uploads/dissco-logo-web.svg" alt="DiSSCo logo">
+    </div>
+
+    <div class="container interface">
+      <div class="row">
+        <div class="col-md-2 selectModeBlock">
+          <h3 class="selectModeTitle"> Select mode </h3>
+
+          <div class="row">
+            <div id="selectModeInput" class="col-md-6 selectMode active" onclick="switchMode('input')">
+              Input
+            </div>
+            <div id="selectModeExport" class="col-md-6 selectMode" onclick="switchMode('export')">
+              Export
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-8 offset-md-1">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-3 tab active" id="introTab">
+                  Introduction
+                </div>
+                <div class="col-md-3 tab" id="googleTab">
+                  Google Forms
+                </div>
+                <div class="col-md-3 tab outer" id="monkeyTab">
+                  SurveyMonkey
+                </div> 
+              </div>
+            </div>
+            <div class="col-md-12 generalSection">
+              <div class="row">
+                <!-- Add field to form section -->
+                <div id="inputFormFieldSection" class="applicationSection active">
+
+                  <div class="col-md-10 offset-md-1 section active" id="introSection">
+                    <h2> Introduction </h2>
+
+                    <p> 
+                      Welcome to the DiSSCo Organisation Form Service! This service empowers you to add
+                      registered DiSSCo partners as a form field to your form. Currently Google Forms and
+                      SurveyMonkey are supported. Please select the tab of the service you wish to use.
+                    </p>
+                    <p>
+                      This build contains an experimental version of the Organisation Form Service and
+                      should be considered as such 
+                    </p>
+                    <p>
+                      A manual about the purpose and use of this application can be found at:
+                    </p>
+                    <a href=""> Link to manual </a>
+                  </div>
+                  <div class="col-md-10 offset-md-1 section" id="googleSection">
+                    <h2> Google Forms </h2>
+
+                    <!-- Form for Google API -->
+                    <form id="google_form">
+                      <div class="row">
+                        <h3 class="subtitle"> Use this to add an organisations field to your Google Form </h3>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-12 paragraph">
+                          Because of Google Apps Script we can easily add an organisation field to a form. It is, 
+                          however, necessary to allow the application to access your Google Forms in Drive. Logically 
+                          you will need to be signed in to the Google account that is hosting the form.
+                        </div>
+                      </div> 
+
+                      <div class="row">
+                        <div class="col-md-12 paragraph">
+                          <strong> 1. </strong> Check if your logged into the correct Google account that is hosting the form to be modified.
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 paragraph">
+                          <strong> 2. </strong> Now, copy your form’s id (identifier) to the form id field in the interface. Your form id can be 
+                          found in the url (address bar) of your Google form (it is the long string of characters after /forms/d/) and 
+                          click on process.
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <p class="paragraph"> Please insert your form id: </p>
+
+                        <div class="col-md-12">
+                          <input name="form_id" class="input" type="text"> </input>
+                          <div id="googleLoading" class="loading">
+                            <div id="googleSpinner" class="spinner-border" role="status">
+                              <span class="sr-only">Loading...</span>
+                            </div>
+                            <i id="googleCheck" class="fas fa-check confirmationIcon"> </i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-3">
+                          <button type="button" class="submitButton" onclick="processForm(this.form, 'google')"> Process </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-md-10 offset-md-1 section" id="monkeySection">
+                    <h2> SurveyMonkey </h2>
+
+                    <!-- Form for SurveyMonkey API -->
+                    <form id="monkey_form">
+                      <h3 class="subtitle"> Use this to add an organisations field to your SurveyMonkey Form </h3>
+
+                      <div class="row">
+                        <div class="col-md-12 paragraph">
+                          SurveyMonkey provides an API which we can use to modify our forms and thus insert an organisation field. 
+                          However, it requires additional steps compared to Google Forms. These steps are not hard to execute, but 
+                          make the process a bit cumbersome. First off, check the <a href=""> manual </a> on how to setup the preparations 
+                          for using the SurveyMonkey API. Then continue with the steps below.
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <p class="paragraph"> <strong> 1. </strong> Please insert your app's authentication token and press on the search icon: </p>
+
+                        <div class="col-md-12">
+                          <input name="auth" id="monkeyAuth" type="text"> </input>
+                          <div class="searchButton" onclick="getMonkeyForms()">
+                            <i class="fas fa-magnifying-glass"> </i>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        <p class="paragraph"> <strong> 2. </strong> Select your form from the list: </p>
+
+                        <div class="col-md-12" style="position: relative; z-index: 1;">
+                          <select name='form_id' id="monkeySelect" class="select"> </select>
+                          <div id="monkeyLoading" class="loading monkey">
+                            <div id="monkeySpinner" class="spinner-border" role="status">
+                              <span class="sr-only">Loading...</span>
+                            </div>
+                            <i id="monkeyCheck" class="fas fa-check confirmationIcon"> </i>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <p class="paragraph"> <strong> Optional. </strong> Insert the desired page (pages start at 1): </p>
+
+                        <div class="col-md-12">
+                          <input name="page" type="number" min=1 value=1> </input>
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        <p class="paragraph">
+                          <strong> 3. </strong> Click on Process to add the organisation field to your form.
+                        </p>
+                        <div class="col-md-3">
+                          <button type='button' class="submitButton" onclick="processForm(this.form, 'monkey')"> Process </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+
+                </div>
+
+                <!-- Export form responses section -->
+                <div id="exportFormResponsesSection" class="applicationSection">
+
+                  <div class="col-md-10 offset-md-1 section active" id="introExportSection">
+                    <h2> Introduction </h2>
+
+                    <p> 
+                      Welcome to the DiSSCo Organisation Form Service! This service empowers you to export
+                      your form responses and save them in the DiSSCo database. Currently Google Forms and
+                      SurveyMonkey are supported. Please select the tab of the service you wish to use.
+                    </p>
+                    <p>
+                      This build contains an experimental version of the Organisation Form Service and
+                      should be considered as such 
+                    </p>
+                    <p>
+                      A manual about the purpose and use of this application can be found at:
+                    </p>
+                    <a href=""> Link to manual </a>
+                  </div>
+
+                  <div class="col-md-10 offset-md-1 section" id="googleExportSection">
+                    <h2> Google Forms </h2>
+
+                    <form id="googleExportForm">
+                      <div class="row">
+                        <h3 class="subtitle"> Use this to export responses from a Google Form </h3>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-12 paragraph">
+                          Text
+                        </div>
+                      </div> 
+
+                      <div class="row">
+                        <div class="col-md-12 paragraph">
+                          <strong> 1. </strong> Check if your logged into the correct Google account that is hosting the form to be used.
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12 paragraph">
+                          <strong> 2. </strong> Now, copy your form’s id (identifier) to the form id field in the interface. Your form id can be 
+                          found in the url (address bar) of your Google form (it is the long string of characters after /forms/d/) and 
+                          click on process.
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <p class="paragraph"> Please insert your form id: </p>
+
+                        <div class="col-md-12">
+                          <input name="form_id" class="input" type="text"> </input>
+                          <div id="googleExportLoading" class="loading">
+                            <div id="googleExportSpinner" class="spinner-border" role="status">
+                              <span class="sr-only">Loading...</span>
+                            </div>
+                            <i id="googleExportCheck" class="fas fa-check confirmationIcon"> </i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-3">
+                          <button type="button" class="submitButton" onclick="exportForm(this.form, 'google')"> Process </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div class="col-md-10 offset-md-1 section" id="monkeyExportSection">
+                    <h2> SurveyMonkey </h2>
+
+                    <!-- Form for SurveyMonkey API -->
+                    <form id="monkey_form">
+                      <h3 class="subtitle"> Use this to export responses from your SurveyMonkey Form </h3>
+
+                      <div class="row">
+                        <div class="col-md-12 paragraph">
+                          SurveyMonkey provides an API which we can use to access our forms and thus request responses. 
+                          However, it requires additional steps compared to Google Forms. These steps are not hard to execute, but 
+                          make the process a bit cumbersome. First off, check the <a href=""> manual </a> on how to setup the preparations 
+                          for using the SurveyMonkey API. Then continue with the steps below.
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <p class="paragraph"> <strong> 1. </strong> Please insert your app's authentication token and press on the search icon: </p>
+
+                        <div class="col-md-12">
+                          <input name="auth" id="monkeyExportAuth" type="text"> </input>
+                          <div class="searchButton" onclick="getMonkeyForms('Export')">
+                            <i class="fas fa-magnifying-glass"> </i>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        <p class="paragraph"> <strong> 2. </strong> Select your form from the list: </p>
+
+                        <div class="col-md-12" style="position: relative; z-index: 1;">
+                          <select name='form_id' id="monkeyExportSelect" class="select"> </select>
+                          <div id="monkeyExportLoading" class="loading monkey">
+                            <div id="monkeyExportSpinner" class="spinner-border" role="status">
+                              <span class="sr-only">Loading...</span>
+                            </div>
+                            <i id="monkeyExportCheck" class="fas fa-check confirmationIcon"> </i>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <p class="paragraph">
+                          <strong> 3. </strong> Click on Process to export the responses from your form.
+                        </p>
+                        <div class="col-md-3">
+                          <button type='button' class="submitButton" onclick="exportForm(this.form, 'monkey')"> Process </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                
+                </div>
+              </row>
+            </div>
+          </div>
+        </div>
+    </div>
+  </body>
+
+  <script>
+    function exportForm(form, type) {
+      type += 'Export';
+
+      /* Loading components */
+      let loadingSection = document.getElementById(type + "Loading");
+      let loadingSpinner = document.getElementById(type + "Spinner");
+      let loadingCheck = document.getElementById(type + 'Check');
+
+      /* Set loader active */
+      loadingSection.classList.add('load');
+      loadingSpinner.classList.add('active')
+
+      if (type == 'googleExport') {
+        let form_id = form.form_id.value;
+
+        google.script.run.withSuccessHandler(process).exportGoogleForm(form_id);
+      } else if (type == 'monkeyExport') {
+        let survey_id = form.form_id.value;
+        let auth = form.auth.value;
+
+        google.script.run.withSuccessHandler(process).exportMonkeyForm(survey_id, auth);
+      }
+
+      function process(responses) {
+        loadingCheck.classList.add('active');
+        loadingSpinner.classList.remove('active');
+
+        setTimeout(function() {
+          loadingSection.classList.remove('load');
+          loadingCheck.classList.remove('active');
+        }, 2000);
+      }
+    }
+
+    function processForm(form, type) {
+      /* Loading components */
+      let loadingSection = document.getElementById(type + "Loading");
+      let loadingSpinner = document.getElementById(type + "Spinner");
+      let loadingCheck = document.getElementById(type + 'Check');
+
+      /* Set loader active */
+      loadingSection.classList.add('load');
+      loadingSpinner.classList.add('active')
+
+      function process() {
+        loadingCheck.classList.add('active');
+        loadingSpinner.classList.remove('active');
+
+        setTimeout(function() {
+          loadingSection.classList.remove('load');
+          loadingCheck.classList.remove('active');
+        }, 2000);
+      }
+
+      /* Check which type of form is called */
+      if (form.id == 'google_form') {
+        form_id = form.form_id.value;
+
+        google.script.run.withSuccessHandler(process).fillGoogleForm(form_id);
+      } else if (form.id == 'monkey_form') {
+        auth = form.auth.value;
+        form_id = form.form_id.value;
+        page = form.page.value;
+
+        google.script.run.withSuccessHandler(process).fillMonkeyForm(auth, form_id, page);
+      }
+    }
+
+    function toggleTab(id, exportable = false) {
+      /* Toggle tabs */
+      let tabs = document.getElementsByClassName('tab');
+      
+      $(tabs).each(function(i, tab) {
+        tab.classList.remove('active');
+      });
+
+      document.getElementById(id + 'Tab').classList.add('active');
+
+      /* Toggle sections */
+      if (exportable) {
+        id += 'Export';
+      }
+
+      let sections = document.getElementsByClassName('section');
+
+      $(sections).each(function(i, section) {
+        section.classList.remove('active');
+      });
+
+      document.getElementById(id + 'Section').classList.add('active');
+    }
+
+    function getMonkeyForms(prefix = null) {
+      let auth;
+
+      if (prefix) {
+        auth = document.getElementById('monkey' + prefix + 'Auth').value;
+      } else {
+        auth = document.getElementById('monkeyAuth').value;
+      }
+
+      google.script.run.withSuccessHandler(process).getMonkeyForms(auth);
+      
+      function process(data) {
+        /* Set select items */
+        let select;
+
+        if (prefix) {
+          select = document.getElementById('monkey' + prefix + 'Select');
+        } else {
+          select = document.getElementById('monkeySelect');
+        }
+        
+        $(select)
+          .find('option')
+          .remove();
+
+        $(data['data']).each(function(i, form) {
+          $(select).append(
+            '<option value=' + form.id + '> ' + form.title + ' </option>'
+          );
+        });
+      }
+    }
+
+    function switchMode(mode) {
+      let applicationSections = document.getElementsByClassName('applicationSection');
+      $(applicationSections).each(function(i, appSection) {
+        appSection.classList.remove('active');
+      });
+
+      if (mode == 'input') {
+        document.getElementById('inputFormFieldSection').classList.add('active');
+
+        document.getElementById('selectModeInput').classList.add('active');
+        document.getElementById('selectModeExport').classList.remove('active');
+
+        /* Set event handlers of tabs */
+        $('#introTab').off().on('click', function() {
+          toggleTab('intro');
+        });
+
+        $('#googleTab').off().on('click', function() {
+          toggleTab('google');
+        });
+
+        $('#monkeyTab').off().on('click', function() {
+          toggleTab('monkey');
+        });
+
+        /* Open current section */
+        $(".sections").each(function(i, section) {
+          section.classList.remove('active');
+        });
+
+        let currentTab = $('.tab.active')[0].id.replace('Tab', '');
+
+        document.getElementById(currentTab + 'Section').classList.add('active');
+      } else if (mode == 'export') {
+        document.getElementById('exportFormResponsesSection').classList.add('active');
+
+        document.getElementById('selectModeInput').classList.remove('active');
+        document.getElementById('selectModeExport').classList.add('active');
+
+         /* Set event handlers of tabs */
+        $('#introTab').off().on('click', function() {
+          toggleTab('intro', true);
+        });
+
+        $('#googleTab').off().on('click', function() {
+          toggleTab('google', true);
+        });
+
+        $('#monkeyTab').off().on('click', function() {
+          toggleTab('monkey', true);
+        });
+
+        /* Open current section */
+        $(".sections").each(function(i, section) {
+          section.classList.remove('active');
+        });
+
+        let currentTab = $('.tab.active')[0].id.replace('Tab', '');
+
+        document.getElementById(currentTab + 'ExportSection').classList.add('active');
+      }
+    }
+
+    /* Add event listeners */
+    $(document).ready(function() {
+      $("#introTab").on('click', function() {
+        toggleTab('intro');
+      });
+
+      $("#googleTab").on('click', function() {
+        toggleTab('google');
+      });
+
+      $("#monkeyTab").on('click', function() {
+        toggleTab('monkey');
+      });
+    });
+  </script>
+</html>
