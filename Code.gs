@@ -29,6 +29,32 @@ function getOrganisationData() {
   return returnArray;
 }
 
+function postOrganisationData(formData, callback) {
+  /* For each response to form, insert new record */
+  const query = '"Apps Script" stars:">=100"';
+  let url = 'https://sandbox.dissco.tech/api/v1/organisation/document' + '?sort=stars' + '&q=' + encodeURIComponent(query);
+  let options = {
+    'method': 'POST',
+    'contentType': 'application/json'
+  }
+
+  for (let response in formData) {
+    let document = {
+      'organisation_id': formData[response]['organisation_id'],
+      'document_id': formData[response]['form_id'],
+      'document_title': formData[response]['form_title'],
+      'document_type': formData[response]['form_type'],
+      'document': formData[response]['questions']
+    };
+
+    options['payload'] = JSON.stringify(document);
+
+    UrlFetchApp.fetch(url, options);
+  }
+
+  callback(true);
+}
+
 function fillMonkeyForm(auth, survey_id, page = 1) {
   /* Check if page is greater than zero */
   if (!page > 0) {
@@ -157,8 +183,6 @@ function fillGoogleForm(form_id) {
 
 /* Read data from forms */
 function exportGoogleForm(form_id) {
-  form_id = '1FrPOiVcSh4TSxtPcO-Il3pbdTO8noW-AgyhNMbMA86Y';
-
   /* Retrieve organisations with ROR id */
   let organisationsData = getOrganisationData();
 
@@ -166,57 +190,52 @@ function exportGoogleForm(form_id) {
 
   let responses = {};
 
+  let formTitle = form.getTitle();
+  let formType = 'Google Forms';
   var formResponses = form.getResponses();
-
-  // var formResponses = form.getResponses();
-  // for (var i = 0; i < formResponses.length; i++) {
-  //   var formResponse = formResponses[i];
-  //   var itemResponses = formResponse.getItemResponses();
-  //   for (var j = 0; j < itemResponses.length; j++) {
-  //     var itemResponse = itemResponses[j];
-  //     Logger.log('Response #%s to the question "%s" was "%s"',
-  //         (i + 1).toString(),
-  //         itemResponse.getItem().getTitle(),
-  //         itemResponse.getResponse());
-  //   }
-  // }
 
   for (var i = 0; i < formResponses.length; i++) {
     responses['response: ' + i] = {
-      'answers': {}
+      'questions': {}
     };
 
     var formResponse = formResponses[i];
     var itemResponses = formResponse.getItemResponses();
 
     for (var j = 0; j < itemResponses.length; j++) {
+      /* Set questions and answers */
       var itemResponse = itemResponses[j];
     
       if (itemResponse.getItem().getTitle() == 'Choose a DiSSCo Organisation:') {
         let ror = organisationsData[itemResponse.getResponse()]['ror'];
         
-        if (!responses['response: ' + i][itemResponse.getItem().getTitle()]) {
-          responses['response: ' + i][itemResponse.getItem().getTitle()] = [ror];
-        } else {
-          responses['response: ' + i][itemResponse.getItem().getTitle()].push(ror);
+        if (!responses['response: ' + i]['organisation_id']) {
+          responses['response: ' + i]['organisation_id'] = ror;
         }
       } else {
-        if (!responses['response: ' + i]['answers'][itemResponse.getItem().getTitle()]) {
-          responses['response: ' + i]['answers'][itemResponse.getItem().getTitle()] = [itemResponse.getResponse()];
+        if (!responses['response: ' + i]['questions'][itemResponse.getItem().getTitle()]) {
+          responses['response: ' + i]['questions'][itemResponse.getItem().getTitle()] = [itemResponse.getResponse()];
         } else {
-          responses['response: ' + i]['answers'][itemResponse.getItem().getTitle()].push(itemResponse.getResponse());
+          responses['response: ' + i]['questions'][itemResponse.getItem().getTitle()].push(itemResponse.getResponse());
         }
       }
+
+      /* Set general form info */
+      responses['response: ' + i]['form_id'] = form_id;
+      responses['response: ' + i]['form_type'] = formType;
+      responses['response: ' + i]['form_title'] = formTitle;
     }
   }
 
-  return responses;
+  /* Insert records into #document store# (database) */
+  postOrganisationData(responses, process);
+
+  function process(check) {
+    return check;
+  } 
 }
 
-function exportMonkeyForm(survey_id, auth) {
-  survey_id = '401528179';
-  auth = 'tOt-QCvM5tKO73Krcx3Kwabq7XEnp9u9N091e8DdW3A48oVMAPyb4wvUKBnhCs8D.T1f4im-5OeeFTel3bXjwNGQkE.hLL7G-OxyGj3S5JN6au436ciazOmxB3Tz5wxc';
-
+function exportMonkeyForm(survey_id, auth, survey_title) {
   let options = {
     'method' : 'GET',
     'headers':{'Authorization':'bearer ' + auth},
@@ -229,11 +248,12 @@ function exportMonkeyForm(survey_id, auth) {
 
     let organisationsData = getOrganisationData();
     let responses = {};
+    let formType = 'SurveyMonkey';
     let i = 0;
 
     for (key in data) {
       responses['response: ' + i] = {
-        'answers': {}
+        'questions': {}
       };
       
       let responseIndicator = 'response: ' + i;
@@ -243,31 +263,39 @@ function exportMonkeyForm(survey_id, auth) {
         let page = respondent['pages'][key];
 
         for (key in page['questions']) {
+          /* Set questions and answers */
           let question = page['questions'][key];
 
           if (question.heading == 'Choose a DiSSCo Organisation:') {
             let organisationText = question['answers'][0]['simple_text'].replace('Organisation: | Choose | ', '');
             let ror = organisationsData[organisationText]['ror'];
 
-            if (!responses[responseIndicator][question['heading']]) {
-              responses[responseIndicator][question['heading']] = [ror];
-            } else {
-              responses[responseIndicator][question['heading']].push(ror);
+            if (!responses[responseIndicator]['organisation_id']) {
+              responses[responseIndicator]['organisation_id'] = ror;
             }
           } else {
-            if (!responses[responseIndicator]['answers'][question['heading']]) {
-              responses[responseIndicator]['answers'][question['heading']] = [question['answers'][0]['simple_text']];
+            if (!responses[responseIndicator]['questions'][question['heading']]) {
+              responses[responseIndicator]['questions'][question['heading']] = [question['answers'][0]['simple_text']];
             } else {
-              responses[responseIndicator]['answers'][question['heading']].push(question['answers'][0]['simple_text']);
+              responses[responseIndicator]['questions'][question['heading']].push(question['answers'][0]['simple_text']);
             }
           }
         }
       }
 
+      /* Set general form info */
+      responses[responseIndicator]['form_id'] = survey_id;
+      responses[responseIndicator]['form_type'] = formType;
+      responses[responseIndicator]['form_title'] = survey_title;
+
       i++;
     }
 
-    return responses;
+    postOrganisationData(responses, process);
+
+    function process(check) {
+      return check;
+    }
   }
 }
 
@@ -281,6 +309,10 @@ function readMonkeyForm(auth, survey_id) {
     };
 
   let response = UrlFetchApp.fetch('https://api.surveymonkey.com/v3/surveys/' + survey_id + '/responses');
-
-  console.log(response);
 }
+
+
+
+
+
+
