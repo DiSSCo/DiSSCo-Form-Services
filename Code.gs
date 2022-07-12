@@ -20,7 +20,7 @@ function getOrganisationData() {
       numberCheck[data[key]['name']] = 1;
     } else {
       numberCheck[data[key]['name']] += 1;
-      data[key]['name'] = data[key]['name'] + ' (' + numberCheck[data[key]['name']] + ')';
+      data[key] = data[key]['name'] + ' (' + numberCheck[data[key]['name']] + ')';
     }
 
     returnArray[data[key]['name']] = data[key];
@@ -224,6 +224,10 @@ function exportGoogleForm(form_id) {
       responses['response: ' + i]['form_id'] = form_id;
       responses['response: ' + i]['form_type'] = formType;
       responses['response: ' + i]['form_title'] = formTitle;
+    }    
+
+    if (!responses['response: ' + i]['organisation_id']) {
+      delete responses['response: ' + i];
     }
   }
 
@@ -288,6 +292,10 @@ function exportMonkeyForm(survey_id, auth, survey_title) {
       responses[responseIndicator]['form_type'] = formType;
       responses[responseIndicator]['form_title'] = survey_title;
 
+      if (!responses['response: ' + i]['organisation_id']) {
+        delete responses['response: ' + i];
+      }
+
       i++;
     }
 
@@ -310,9 +318,3 @@ function readMonkeyForm(auth, survey_id) {
 
   let response = UrlFetchApp.fetch('https://api.surveymonkey.com/v3/surveys/' + survey_id + '/responses');
 }
-
-
-
-
-
-

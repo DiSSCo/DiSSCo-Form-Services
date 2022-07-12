@@ -488,7 +488,7 @@
         google.script.run.withSuccessHandler(process).exportMonkeyForm(survey_id, auth, title);
       }
 
-      function process(response) {
+      function process() {
         loadingCheck.classList.add('active');
         loadingSpinner.classList.remove('active');
 
