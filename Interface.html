@@ -483,11 +483,12 @@
       } else if (type == 'monkeyExport') {
         let survey_id = form.form_id.value;
         let auth = form.auth.value;
+        let title = form.title;
 
-        google.script.run.withSuccessHandler(process).exportMonkeyForm(survey_id, auth);
+        google.script.run.withSuccessHandler(process).exportMonkeyForm(survey_id, auth, title);
       }
 
-      function process(responses) {
+      function process() {
         loadingCheck.classList.add('active');
         loadingSpinner.classList.remove('active');
 
